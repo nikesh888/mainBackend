@@ -3,7 +3,7 @@ import { chromium } from "playwright";
 const scraper = async (keyword, pincode) => {
   let googleUrl = `https://www.google.com/maps/search/${keyword}+${pincode}/data=!3m1!4b1?entry=ttu`;
   console.time("Execution Time");
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
   await page.goto(googleUrl);
   await page.waitForSelector('[jstcache="3"]');

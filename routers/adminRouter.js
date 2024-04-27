@@ -1,23 +1,23 @@
-import express from "express";
 import bcrypt from "bcrypt";
-import fs from "fs";
+import express from "express";
+import fs from "fs/promises";
 import requestIp from "request-ip";
-import Admin from "../models/admin.js";
-import Users from "../models/users.js";
-import Resellers from "../models/resellers.js";
 import wpw from "whatsapp-web.js";
-const { Client, LocalAuth, MessageMedia } = wpw;
 import {
-  userLoginValidatorRules,
-  errorMiddleware,
   addUserRules,
+  errorMiddleware,
+  userLoginValidatorRules,
 } from "../middlewares/validations/index.js";
+import Admin from "../models/admin.js";
+import Resellers from "../models/resellers.js";
+import Users from "../models/users.js";
+const { Client, LocalAuth, MessageMedia } = wpw;
 
 import generateToken from "../auth/generateToken.js";
 import authMiddleware from "../auth/verifyToken.js";
 
-import scraper from "../scraper.js";
 import Payments from "../models/payments.js";
+import scraper from "../scraper.js";
 const router = express.Router();
 
 const initializeClient = () => {
@@ -34,7 +34,11 @@ const initializeClient = () => {
 };
 
 // Send message to a single number
-const sendMessageToNumber = async (client, number, message, media) => {
+/**
+ *
+ * @param {wpw.Client} client
+ */
+const sendMessageToNumber = async (client, number, message, media, token) => {
   const numberDetails = await client.getNumberId(number);
   if (numberDetails) {
     try {
@@ -43,9 +47,16 @@ const sendMessageToNumber = async (client, number, message, media) => {
         message,
         { media }
       );
+      await fs.appendFile(`./logs/${token}.txt`, `Message Sent to ${number}\n`);
       return sendMessageData;
     } catch (error) {
+      await fs.appendFile(
+        `logs/${token}.txt`,
+        `Unable to send message to ${number}\n`
+      );
+
       console.error(`Error occurred sending message: ${error}`);
+      throw error;
       return null;
     }
   } else {
@@ -84,7 +95,9 @@ router.post(
       const clientip = requestIp.getClientIp(req);
 
       // res.cookie("token", token).send();
-      res.status(200).json({ token, role: userData.userType, clientip });
+      res
+        .status(200)
+        .json({ token, role: userData.userType, clientip, id: userData._id });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -118,15 +131,13 @@ router.post(
       const clientip = requestIp.getClientIp(req);
 
       // res.cookie("token", token).send();
-      res
-        .status(200)
-        .json({
-          token,
-          role: userData.userType,
-          clientip,
-          whatsapp: userData.whatsapp,
-          database: userData.database,
-        });
+      res.status(200).json({
+        token,
+        role: userData.userType,
+        clientip,
+        whatsapp: userData.whatsapp,
+        database: userData.database,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -222,6 +233,59 @@ router.post(
   }
 );
 
+router.put(
+  "/updateBranding",
+  authMiddleware,
+  errorMiddleware,
+  async (req, res) => {
+    try {
+      let email = req.payload.email;
+
+      console.log(email);
+      let userData = await Admin.findOne({ email });
+      if (!userData) {
+        userData = await Resellers.findOne({ email });
+      }
+
+      let { name, logo } = req.body;
+
+      userData.companyName = name;
+      userData.companylogo = logo;
+
+      await userData.save();
+
+      res.status(200).json({ success: `updated` });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: `Internal Server Issue` });
+    }
+  }
+);
+
+router.get(
+  "/getBranding",
+  authMiddleware,
+  errorMiddleware,
+  async (req, res) => {
+    try {
+      let email = req.payload.email;
+
+      let userData = await Admin.findOne({ email });
+      if (!userData) {
+        userData = await Resellers.findOne({ email });
+      }
+
+      let name = userData.companyName;
+      let logo = userData.companylogo;
+
+      res.status(200).json({ name, logo });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: `Internal Server Issue` });
+    }
+  }
+);
+
 router.get(
   "/getressellers",
   authMiddleware,
@@ -292,7 +356,7 @@ router.post("/getdata", errorMiddleware, async (req, res) => {
 
 router.post("/sendmsg", async (req, res) => {
   try {
-    const { numbers, message, fileToSend } = req.body;
+    const { numbers, message, fileToSend, token, type, fileName } = req.body;
 
     // Initialize WhatsApp client
     const client = initializeClient();
@@ -301,15 +365,18 @@ router.post("/sendmsg", async (req, res) => {
       // Send messages to numbers
       for (const number of numbers) {
         console.log(`Sending message to ${number}`);
-        const media = fileToSend
-          ? MessageMedia.fromFilePath(fileToSend)
-          : undefined;
-        await sendMessageToNumber(client, number, message, media);
+        let media = undefined;
+        if (fileToSend[0] && type[0]) {
+          media = fileToSend
+            ? new MessageMedia(type[0], fileToSend[0], fileName[0])
+            : undefined;
+        }
+        await sendMessageToNumber(client, number, message, media, token);
       }
       res.send("Messages sent successfully!");
       setTimeout(() => {
         client.destroy();
-      }, 2000);
+      }, 5000);
     });
 
     // Initialize the client
@@ -319,6 +386,31 @@ router.post("/sendmsg", async (req, res) => {
   }
 });
 
+router.post("/getLogs", async (req, res) => {
+  const token = req.body.id;
+
+  // Check if token is present
+  if (!token) {
+    return res.status(400).send("Token is required");
+  }
+
+  // Read logs from file
+  const logsFilePath = `./logs/${token}.txt`;
+
+  try {
+    const data = await fs.readFile(logsFilePath, "utf8");
+
+    // Split logs by newline character and wrap each line in a span tag
+    const logsArray = data.split("\n");
+    const logsHTML = logsArray.map((log) => log).join("\n");
+
+    // Send the logs in HTML format
+    res.send(logsHTML);
+  } catch (err) {
+    // Handle file read error
+    res.status(204).send("Error reading logs");
+  }
+});
 router.post(
   "/addpayments",
   authMiddleware,
