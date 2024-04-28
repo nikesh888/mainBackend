@@ -1,0 +1,23 @@
+[0428/234211.617:INFO:CONSOLE(136)] "Event handler of 'x-storagemutated-1' event must be added on the initial evaluation of worker script.", source: https://static.whatsapp.net/rsrc.php/v3/ya/r/e1v6Qu9qiFS.js?_nc_x=Ij3Wp8lg5Kz (136)
+[0428/234211.727:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Feature xr-spatial-tracking's parameters are ignored.", source:  (0)
+[0428/234211.727:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'attribution-reporting'.", source:  (0)
+[0428/234211.727:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'window-management'.", source:  (0)
+[0428/234213.474:INFO:CONSOLE(136)] "Event handler of 'x-storagemutated-1' event must be added on the initial evaluation of worker script.", source: https://static.whatsapp.net/rsrc.php/v3/ya/r/e1v6Qu9qiFS.js?_nc_x=Ij3Wp8lg5Kz (136)
+[0428/234227.075:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Feature xr-spatial-tracking's parameters are ignored.", source:  (0)
+[0428/234227.075:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Origin trial controlled feature not enabled: 'attribution-reporting'.", source:  (0)
+[0428/234227.076:INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'window-management'.", source:  (0)
+[0428/234227.578:ERROR:leveldb_factory.cc(88)] Failed to open LevelDB database from F:\project 0\server 2.0\.wwebjs_auth\session-User4\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb,IO error: F:\project 0\server 2.0\.wwebjs_auth\session-User4\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001: Unable to create sequential file (ChromeMethodBFE: 7::NewSequentialFile::4)
+[0428/234227.584:ERROR:leveldb_factory.cc(88)] Failed to open LevelDB database from F:\project 0\server 2.0\.wwebjs_auth\session-User4\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb,IO error: F:\project 0\server 2.0\.wwebjs_auth\session-User4\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001: Unable to create sequential file (ChromeMethodBFE: 7::NewSequentialFile::4)
+[0428/234227.669:ERROR:entry_impl.cc(1072)] No file for 800001a2
+[0428/234227.675:ERROR:entry_impl.cc(1072)] No file for 800001a3
+[0428/234227.679:ERROR:entry_impl.cc(1072)] No file for 80000199
+[0428/234227.680:ERROR:entry_impl.cc(1072)] No file for 8000019b
+[0428/234227.681:ERROR:entry_impl.cc(1072)] No file for 8000019a
+[0428/234227.686:ERROR:entry_impl.cc(1072)] No file for 8000019c
+[0428/234227.687:ERROR:entry_impl.cc(1072)] No file for 80000198
+[0428/234227.688:ERROR:entry_impl.cc(1072)] No file for 8000019d
+[0428/234227.688:ERROR:entry_impl.cc(1072)] No file for 8000019e
+[0428/234227.689:ERROR:entry_impl.cc(1072)] No file for 8000019f
+[0428/234227.691:ERROR:entry_impl.cc(1072)] No file for 800001a0
+[0428/234228.196:ERROR:entry_impl.cc(1072)] No file for 800001a4
+[0428/234228.217:INFO:CONSOLE(1)] "Uncaught NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope': The script at 'https://static.whatsapp.net/rsrc.php/v3/yb/r/MEF_5RaqEY0.js?_nc_x=Ij3Wp8lg5Kz' failed to load.", source: https://web.whatsapp.com/static_resources/webworker_v1/init_script/?__hs=19841.HYP%3Awhatsapp_comet_pkg.2.1..0.1&__spin_r=1013111704&__spin_b=trunk&__spin_t=1714327947 (1)

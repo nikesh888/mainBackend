@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import express from "express";
 import fs from "fs/promises";
+import qr from "qrcode";
 import requestIp from "request-ip";
 import wpw from "whatsapp-web.js";
 import {
@@ -15,18 +16,17 @@ const { Client, LocalAuth, MessageMedia } = wpw;
 
 import generateToken from "../auth/generateToken.js";
 import authMiddleware from "../auth/verifyToken.js";
-
 import Payments from "../models/payments.js";
-import scraper from "../scraper.js";
+import scraper from "../websocket-scraper.js";
 const router = express.Router();
 
 const initializeClient = () => {
   const client = new Client({
     authStrategy: new LocalAuth({
-      clientId: "User",
+      clientId: "User4",
     }),
     puppeteer: {
-      headless: false,
+      headless: true,
     },
   });
 
@@ -65,6 +65,40 @@ const sendMessageToNumber = async (client, number, message, media, token) => {
   }
 };
 
+router.get("/getQR", async (req, res) => {
+  try {
+    const loggedInFile = await fs.readFile(
+      "./image/alreadyLoggedIn.txt",
+      "utf-8"
+    );
+    const client = initializeClient();
+
+    client.on("qr", async (qrData) => {
+      try {
+        // Generate QR code image from the data
+        const qrImage = await qr.toDataURL(qrData);
+        // Log the QR code data to console
+        res.send(qrImage);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+    client.on("ready", async () => {
+      setTimeout(async () => {
+        await client.destroy();
+        try {
+          res.send(loggedInFile);
+        } catch (error) {
+          console.log(error);
+        }
+      }, 2000);
+    });
+    client.initialize();
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 router.post(
   "/login",
   userLoginValidatorRules(),

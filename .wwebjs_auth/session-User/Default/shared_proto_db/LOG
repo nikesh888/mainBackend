@@ -1,3 +1,2 @@
-2024/04/27-12:37:32.136 24a4 Reusing MANIFEST F:\project 0\server 2.0\.wwebjs_auth\session-User\Default\shared_proto_db/MANIFEST-000001
-2024/04/27-12:37:32.136 24a4 Recovering log #3
-2024/04/27-12:37:32.136 24a4 Reusing old log F:\project 0\server 2.0\.wwebjs_auth\session-User\Default\shared_proto_db/000003.log 
+2024/04/27-20:50:50.864 57c Creating DB F:\project 0\server 2.0\.wwebjs_auth\session-User\Default\shared_proto_db since it was missing.
+2024/04/27-20:50:50.873 57c Reusing MANIFEST F:\project 0\server 2.0\.wwebjs_auth\session-User\Default\shared_proto_db/MANIFEST-000001
