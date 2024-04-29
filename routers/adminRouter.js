@@ -78,20 +78,34 @@ router.get("/getQR", async (req, res) => {
         // Generate QR code image from the data
         const qrImage = await qr.toDataURL(qrData);
         // Log the QR code data to console
-        res.send(qrImage);
+        try {
+          res.send(qrImage);
+        } catch (error) {}
       } catch (error) {
         console.log(error);
       }
     });
-    client.on("ready", async () => {
+    client.on("authenticated", async () => {
       setTimeout(async () => {
         await client.destroy();
         try {
           res.send(loggedInFile);
-        } catch (error) {
-          console.log(error);
-        }
+        } catch (error) {}
       }, 2000);
+    });
+    client.initialize();
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+router.get("/whatsappLogOut", async (req, res) => {
+  try {
+    const client = initializeClient();
+    client.on("ready", async () => {
+      await client.logout();
+      res.send("Logged Out");
     });
     client.initialize();
   } catch (error) {
