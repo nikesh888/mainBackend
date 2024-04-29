@@ -72,42 +72,57 @@ router.get("/getQR", async (req, res) => {
       "utf-8"
     );
     const client = initializeClient();
+    let qrSent = false;
 
     client.on("qr", async (qrData) => {
       try {
         // Generate QR code image from the data
         const qrImage = await qr.toDataURL(qrData);
         // Log the QR code data to console
-        try {
+        if (!qrSent) {
           res.send(qrImage);
-        } catch (error) {}
+          qrSent = true;
+        }
       } catch (error) {
-        console.log(error);
+        console.error(error);
+        res.status(500).send("Internal Server Error");
       }
     });
+
     client.on("authenticated", async () => {
       setTimeout(async () => {
-        await client.destroy();
         try {
-          res.send(loggedInFile);
-        } catch (error) {}
+          if (!qrSent) {
+            res.send(loggedInFile);
+            qrSent = true;
+          }
+          await client.destroy();
+        } catch (error) {
+          console.error(error);
+          res.status(500).send("Internal Server Error");
+        }
       }, 2000);
     });
-    client.initialize();
+    try {
+      client.initialize();
+    } catch (error) {}
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Internal Server Error");
+    console.error(error);
+    try {
+      res.status(500).send("Internal Server Error");
+    } catch {}
   }
 });
 
 router.get("/whatsappLogOut", async (req, res) => {
   try {
-    const client = initializeClient();
-    client.on("ready", async () => {
-      await client.logout();
-      res.send("Logged Out");
-    });
-    client.initialize();
+    try {
+      await fs.rm("./.wwebjs_auth", { recursive: true });
+    } catch (error) {
+      // console.log(error);
+      res.status(500).send("Internal Server Error");
+    }
+    res.send("Logged out");
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal Server Error");
