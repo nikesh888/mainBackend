@@ -4,7 +4,9 @@ import { WebSocketServer } from "ws";
 
 const scraperWs = async () => {
   const wss = new WebSocketServer({ port: 8080 });
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({
+    headless: false,
+  });
   // Create a new browser context
   const context = await browser.newContext();
   console.log(`WebSocket running port:8080`);
@@ -21,7 +23,7 @@ const scraperWs = async () => {
     await page.evaluate((url) => {
       window.location.href = url;
     }, googleUrl);
-    await page.waitForSelector('[jstcache="3"]');
+    await page.waitForSelector('[jstcache="3"]', { timeout: 120000 });
     const scrollable = await page.$(
       "xpath=/html/body/div[2]/div[3]/div[8]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[1]/div[1]"
     );
@@ -162,8 +164,8 @@ const scraperWs = async () => {
       const batchResults = await Promise.all(
         batchUrls.map(async (url) => {
           const newPage = await context.newPage();
-          await newPage.goto(url);
-          await newPage.waitForSelector('[jstcache="3"]');
+          await newPage.goto(url, { timeout: 120000 });
+          await newPage.waitForSelector('[jstcache="3"]', { timeout: 120000 });
           const nameElement = await newPage.$(
             "xpath=/html/body/div[2]/div[3]/div[8]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div/div[1]/div[1]/h1"
           );
