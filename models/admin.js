@@ -10,6 +10,10 @@ const adminSchema = new mongoose.Schema({
   ressellers: { type: Array },
 
   inquiries: { type: Array },
+
+  companyName: { type: String },
+
+  companylogo: { type: String },
 });
 
 export default mongoose.model("Admin", adminSchema, "admin");

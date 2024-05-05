@@ -10,6 +10,10 @@ const resellerSchema = new mongoose.Schema({
   name: { type: String, required: true },
 
   inquiries: { type: Array },
+
+  companyName: { type: String },
+
+  companylogo: { type: String },
 });
 
 export default mongoose.model("Reseller", resellerSchema, "reseller");
